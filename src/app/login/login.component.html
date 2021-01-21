@@ -1,23 +1,48 @@
 <mat-card class="login-page">
-  <mat-card-title>Login</mat-card-title>
+  <mat-card-title>Login (Template Driven)</mat-card-title>
   <mat-card-content>
 
-    <form class="login-form data-form">
+    <form class="login-form data-form" #loginForm="ngForm" (ngSubmit)="login(loginForm, $event)">
 
       <mat-form-field>
 
-        <input matInput type="email" name="email"
-               placeholder="Email">
+        <!--input matInput type="email" name="email" ngModel #email="ngModel" required minlength="5" maxlength="20" email
+          placeholder="Email" [ngModelOptions]="{updateOn: 'blur'}" (ngModelChange)="onEmailChange($event)"-->
 
+          <!-- When we use [ngModel] its uni-directional assignment of values to the model, while [(ngModel)] is used to assign bidirectional values-->
+          <!--input matInput type="email" name="email" [(ngModel)] ="val.email" #email="ngModel" required minlength="5" maxlength="20" email
+          placeholder="Email" -->
+
+          <input matInput type="email" name="email" ngModel #email="ngModel" required minlength="5" maxlength="20" email
+          placeholder="Email" >
+        <mat-error *ngIf="email.errors?.required"> The Email is Mandatory. </mat-error>
+
+          <ng-container *ngIf="email.errors | onlyOneError: ['email','minlength','maxlength'] as error">
+          <mat-error *ngIf="error.email"> The Email is not Valid. </mat-error>
+          <mat-error *ngIf="error.minlength">
+            Your email must have minimum {{email.errors?.minlength.requiredLength}}, you have entered only
+            {{email.errors?.minlength.actualLength}} </mat-error>
+          <mat-error> </mat-error>
+
+          <mat-error *ngIf="error.maxlength">
+            Your email must have maximum {{email.errors?.maxlength.requiredLength}}, you have entered only
+            {{email.errors?.maxlength.actualLength}} </mat-error>
+          </ng-container> 
       </mat-form-field>
+
 
       <mat-form-field>
 
-        <input matInput type="password" placeholder="Password">
-
+        <input matInput type="password" name="password" #password="ngModel" placeholder="Password" ngModel required passwordStrength>
+        <mat-error *ngIf="password.errors?.required"> The Pasword is Mandatory. </mat-error>
+  
+        <mat-error *ngIf="password.errors?.passwordStrength"> 
+          Your password must have lower case, upper case and numeric characters
+        </mat-error>
+       
       </mat-form-field>
 
-      <button mat-raised-button color="primary">
+      <button mat-raised-button color="primary" type="submit" [disabled]="!loginForm.valid">
         Login
       </button>
 
